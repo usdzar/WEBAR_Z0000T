@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AR Model Viewer Demo (USDZ & GLB)</title>
+  <!-- Import Google Model Viewer Web Component -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      margin-top: 40px;
+      max-width: 500px;
+      width: 100%;
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    }
+    model-viewer {
+      width: 100%;
+      height: 400px;
+      background: #ddd;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    input[type="file"] {
+      margin-bottom: 20px;
+    }
+    .info {
+      font-size: 0.95em;
+      color: #555;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>AR Model Viewer (USDZ & GLB)</h2>
+    <div class="info">
+      Load your <b>.glb</b> or <b>.usdz</b> file to preview in 3D.<br>
+      On supported devices, click the AR button to view in Augmented Reality.
+    </div>
+    <input type="file" id="fileInput" accept=".glb,.usdz,model/glb,model/usdz">
+    <model-viewer
+      id="modelViewer"
+      src=""
+      ios-src=""
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      camera-controls
+      shadow-intensity="1"
+      alt="3D model"
+      autoplay
+      exposure="1.2"
+      style="display:none;">
+    </model-viewer>
+    <div id="filename"></div>
+    <script>
+      const fileInput = document.getElementById('fileInput');
+      const modelViewer = document.getElementById('modelViewer');
+      const filenameDiv = document.getElementById('filename');
+
+      fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const url = URL.createObjectURL(file);
+        filenameDiv.textContent = `Loaded: ${file.name}`;
+
+        if (file.name.toLowerCase().endsWith('.usdz')) {
+          modelViewer.setAttribute('ios-src', url);
+          modelViewer.setAttribute('src', '');
+        } else if (file.name.toLowerCase().endsWith('.glb')) {
+          modelViewer.setAttribute('src', url);
+          modelViewer.setAttribute('ios-src', '');
+        } else {
+          filenameDiv.textContent = 'Unsupported file type. Please upload .glb or .usdz.';
+          modelViewer.style.display = 'none';
+          return;
+        }
+        modelViewer.style.display = '';
+      });
+    </script>
+    <div class="info">
+      <b>Note:</b> AR support depends on your device/browser.<br>
+      - <b>GLB</b> files work on Android (Scene Viewer) and browsers with WebXR.<br>
+      - <b>USDZ</b> files work for AR Quick Look on iOS Safari.<br>
+      - Desktop browsers show the 3D viewer only.
+    </div>
+  </div>
+</body>
+</html>
